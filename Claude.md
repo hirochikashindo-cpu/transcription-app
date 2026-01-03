@@ -860,7 +860,17 @@ OPENAI_API_KEY=your_openai_api_key_here
 - ベストプラクティス
 - トラブルシューティング
 
+### 14.6 セキュリティ
+
+**ドキュメント**: [docs/security.md](./docs/security.md)
+
+- Electronセキュリティ設定（サンドボックス、Context Isolation）
+- API Keyの安全な管理
+- データベースセキュリティ（SQLインジェクション対策）
+- XSS対策とファイルアクセス制御
+- セキュリティチェックリスト
+
 ---
 
 **最終更新**: 2026-01-03
-**バージョン**: 1.2
+**バージョン**: 1.3
