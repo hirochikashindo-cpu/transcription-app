@@ -1,6 +1,11 @@
 import { app, BrowserWindow, ipcMain, dialog } from 'electron'
 import path from 'path'
 import { databaseService } from './services/database/database-service'
+import { registerProjectHandlers } from './handlers/project-handlers'
+import { registerTranscriptionHandlers } from './handlers/transcription-handlers'
+import { registerFileHandlers } from './handlers/file-handlers'
+import { registerExportHandlers } from './handlers/export-handlers'
+import { registerSettingsHandlers } from './handlers/settings-handlers'
 
 // Disable GPU acceleration for better stability
 app.disableHardwareAcceleration()
@@ -55,6 +60,13 @@ app.whenReady().then(() => {
     app.quit()
     return
   }
+
+  // Register IPC handlers
+  registerProjectHandlers()
+  registerTranscriptionHandlers()
+  registerFileHandlers()
+  registerExportHandlers()
+  registerSettingsHandlers()
 
   createWindow()
 
