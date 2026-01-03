@@ -1,5 +1,6 @@
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain, dialog } from 'electron'
 import path from 'path'
+import { databaseService } from './services/database/database-service'
 
 // Disable GPU acceleration for better stability
 app.disableHardwareAcceleration()
@@ -40,6 +41,21 @@ const createWindow = () => {
 
 // App lifecycle
 app.whenReady().then(() => {
+  // Initialize database
+  try {
+    databaseService.initialize()
+    console.log('Database initialized successfully')
+  } catch (error) {
+    console.error('Failed to initialize database:', error)
+    dialog.showErrorBox(
+      'Database Error',
+      'Failed to initialize database. The application will now quit.\n\n' +
+        `Error: ${error instanceof Error ? error.message : String(error)}`
+    )
+    app.quit()
+    return
+  }
+
   createWindow()
 
   app.on('activate', () => {
@@ -53,6 +69,11 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
   }
+})
+
+app.on('quit', () => {
+  // Close database connection on quit
+  databaseService.close()
 })
 
 // IPC handlers will be registered here
