@@ -808,6 +808,37 @@ OPENAI_API_KEY=your_openai_api_key_here
 - `feature/*`: 機能開発用ブランチ
 - `hotfix/*`: 緊急修正用ブランチ
 
+### 13.8 CI/CDベストプラクティス
+
+**ドキュメント**: [docs/ci-cd-best-practices.md](./docs/ci-cd-best-practices.md)
+
+CI/CD運用で特に重要な5つのポイント:
+
+1. **GitHub組織設定とコード署名証明書の事前確認**
+   - GitHub Actions権限設定
+   - コード署名証明書の有効期限管理
+
+2. **ビルド成果物のバージョンタグを一致させる**
+   - package.json ⇔ Git tagの一貫性
+   - 自動化スクリプトの使用
+
+3. **GitHub Actions Secretsの権限を事前に設定**
+   - 必要なSecretsの一覧と設定方法
+   - 証明書のbase64エンコード
+
+4. **electron-builderの長時間ビルド処理**
+   - 適切なタイムアウト設定
+   - ビルドキャッシュの活用
+
+5. **CI/CDの状態を常にグリーンに保つ**
+   - 失敗時の即座対応
+   - ブランチ保護ルール
+
+**重要な原則**:
+- ✅ CI/CDが失敗している状態では新規開発を行わない
+- ✅ PRマージ前に必ずCI/CDのグリーン確認
+- ✅ 失敗したら即座に修正（他のタスクより優先）
+
 ---
 
 ## 14. 詳細設計ドキュメント
@@ -873,4 +904,4 @@ OPENAI_API_KEY=your_openai_api_key_here
 ---
 
 **最終更新**: 2026-01-03
-**バージョン**: 1.3
+**バージョン**: 1.4
