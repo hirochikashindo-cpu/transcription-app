@@ -1,13 +1,15 @@
+import { useNavigate } from 'react-router-dom'
 import type { Project } from '@shared/types/electron'
 import './ProjectCard.css'
 
 interface ProjectCardProps {
   project: Project
-  onSelect: (project: Project) => void
   onDelete: (id: string) => void
 }
 
-export function ProjectCard({ project, onSelect, onDelete }: ProjectCardProps) {
+export function ProjectCard({ project, onDelete }: ProjectCardProps) {
+  const navigate = useNavigate()
+
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleString('ja-JP', {
       year: 'numeric',
@@ -43,7 +45,7 @@ export function ProjectCard({ project, onSelect, onDelete }: ProjectCardProps) {
   const statusBadge = getStatusBadge(project.status)
 
   return (
-    <div className="project-card" onClick={() => onSelect(project)}>
+    <div className="project-card" onClick={() => navigate(`/project/${project.id}`)}>
       <div className="project-card-header">
         <h3 className="project-card-title">{project.title}</h3>
         <span className={`project-card-status ${statusBadge.className}`}>
@@ -75,7 +77,7 @@ export function ProjectCard({ project, onSelect, onDelete }: ProjectCardProps) {
           className="btn-secondary"
           onClick={(e) => {
             e.stopPropagation()
-            onSelect(project)
+            navigate(`/project/${project.id}`)
           }}
         >
           詳細

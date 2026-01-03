@@ -4,7 +4,7 @@ import { ProjectCard } from './ProjectCard'
 import './ProjectList.css'
 
 export function ProjectList() {
-  const { projects, filter, setFilter, deleteProject, selectProject, isLoading } = useProjectStore()
+  const { projects, filter, setFilter, deleteProject, isLoading } = useProjectStore()
   const [searchTerm, setSearchTerm] = useState(filter.search || '')
   const [statusFilter, setStatusFilter] = useState<string>(filter.status || 'all')
 
@@ -90,7 +90,6 @@ export function ProjectList() {
             <ProjectCard
               key={project.id}
               project={project}
-              onSelect={selectProject}
               onDelete={deleteProject}
             />
           ))}
