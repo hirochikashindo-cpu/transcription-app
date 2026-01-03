@@ -1,9 +1,16 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { Dashboard } from './pages/Dashboard'
+import './App.css'
+
 function App() {
   return (
-    <div className="app">
-      <h1>Transcription App</h1>
-      <p>Welcome to the Audio Transcription Application</p>
-    </div>
+    <Router>
+      <div className="app">
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+        </Routes>
+      </div>
+    </Router>
   )
 }
 

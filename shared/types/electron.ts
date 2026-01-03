@@ -17,7 +17,7 @@ export interface CreateProjectData {
   title: string
   description?: string
   audio_file_path: string
-  audio_file_name: string
+  audio_file_name?: string
   audio_file_size?: number
   audio_duration?: number
   audio_format?: string

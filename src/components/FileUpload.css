@@ -1,0 +1,44 @@
+.file-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.file-upload-btn {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+}
+
+.file-upload-selected {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background-color: #f0f9ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 0.375rem;
+}
+
+.file-icon {
+  color: var(--primary-color);
+  flex-shrink: 0;
+}
+
+.file-name {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  word-break: break-all;
+}
+
+.file-upload-error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 0.375rem;
+  color: #dc2626;
+  font-size: 0.875rem;
+}

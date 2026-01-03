@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react'
 import electron from 'vite-plugin-electron'
 import renderer from 'vite-plugin-electron-renderer'
 import path from 'path'
+import fs from 'fs'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -12,6 +13,27 @@ export default defineConfig({
       {
         // Main process entry file
         entry: 'electron/main.ts',
+        onstart(_options) {
+          // Copy migrations to dist-electron
+          const srcDir = path.join(__dirname, 'electron/services/database/migrations')
+          const destDir = path.join(__dirname, 'dist-electron/migrations')
+
+          if (fs.existsSync(srcDir)) {
+            if (!fs.existsSync(destDir)) {
+              fs.mkdirSync(destDir, { recursive: true })
+            }
+
+            const files = fs.readdirSync(srcDir)
+            files.forEach(file => {
+              if (file.endsWith('.sql')) {
+                fs.copyFileSync(
+                  path.join(srcDir, file),
+                  path.join(destDir, file)
+                )
+              }
+            })
+          }
+        },
         vite: {
           build: {
             outDir: 'dist-electron',
