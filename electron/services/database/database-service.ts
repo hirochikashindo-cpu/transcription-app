@@ -52,7 +52,13 @@ export class DatabaseService {
     const currentVersion = this.getCurrentSchemaVersion()
     console.log(`Current schema version: ${currentVersion}`)
 
-    const migrationsDir = path.join(__dirname, 'migrations')
+    // 開発環境と本番環境でパスが異なる
+    let migrationsDir = path.join(__dirname, 'migrations')
+
+    // 開発環境の場合、元のソースディレクトリからmigrationsを読み込む
+    if (!fs.existsSync(migrationsDir)) {
+      migrationsDir = path.join(__dirname, '..', 'electron', 'services', 'database', 'migrations')
+    }
 
     // マイグレーションディレクトリが存在しない場合はエラー
     if (!fs.existsSync(migrationsDir)) {

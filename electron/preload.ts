@@ -1,11 +1,8 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron'
 import type {
   CreateProjectData,
-  Project,
   ProjectFilter,
   UpdateProjectData,
-  Transcription,
-  Segment,
   TranscriptionProgress,
   SettingValue,
   ElectronAPI,
