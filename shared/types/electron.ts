@@ -73,3 +73,33 @@ export interface FileValidationResult {
 
 // Settings types
 export type SettingValue = string | number | boolean | object
+
+// Electron API interface
+export interface ElectronAPI {
+  ping: () => Promise<string>
+  project: {
+    create: (data: CreateProjectData) => Promise<Project>
+    findAll: (filter?: ProjectFilter) => Promise<Project[]>
+    findById: (id: string) => Promise<Project>
+    update: (id: string, updates: UpdateProjectData) => Promise<Project>
+    delete: (id: string) => Promise<void>
+  }
+  transcription: {
+    start: (filePath: string, projectId: string) => Promise<void>
+    getByProjectId: (projectId: string) => Promise<Transcription>
+    updateSegment: (segmentId: string, text: string) => Promise<Segment>
+    onProgress: (callback: (progress: TranscriptionProgress) => void) => () => void
+  }
+  file: {
+    select: () => Promise<string | null>
+    validate: (filePath: string) => Promise<FileValidationResult>
+  }
+  export: {
+    toJson: (projectId: string) => Promise<void>
+    toMarkdown: (projectId: string) => Promise<void>
+  }
+  settings: {
+    get: (key: string) => Promise<SettingValue>
+    set: (key: string, value: SettingValue) => Promise<void>
+  }
+}
