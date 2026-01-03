@@ -532,7 +532,8 @@ CREATE TABLE settings (
 - **Claude API**: トークン制限、コスト考慮
 
 ### 10.2 システム要件
-- **Node.js**: 18.x以上
+- **Node.js**: 20.0.0以上（package.jsonで指定）
+- **npm**: 9.0.0以上
 - **FFmpeg**: 音声処理に必須
 - **ディスク容量**: 音声ファイル + データベース分の空き容量
 
@@ -540,6 +541,8 @@ CREATE TABLE settings (
 - **OS**: macOS, Windows, Linux
 - **エディタ**: VS Code推奨
 - **パッケージマネージャー**: npm / pnpm
+- **テストカバレッジ閾値**: 70%（Phase 1）→ 80%（Phase 2以降）
+  - Lines, Functions, Branches, Statementsすべて70%以上を要求
 
 ---
 
@@ -807,5 +810,57 @@ OPENAI_API_KEY=your_openai_api_key_here
 
 ---
 
+## 14. 詳細設計ドキュメント
+
+プロジェクトの詳細な設計仕様は、以下の個別ドキュメントで管理されています：
+
+### 14.1 データモデル設計
+
+**ドキュメント**: [docs/ER.md](./docs/ER.md)
+
+- ER図（Mermaid形式）
+- 全テーブルの詳細仕様
+- リレーション、制約、インデックス
+- クエリ例とパフォーマンス考慮事項
+
+### 14.2 画面設計
+
+**ドキュメント**: [docs/screen.md](./docs/screen.md)
+
+- 全画面の詳細設計
+- レイアウト図とワイヤーフレーム
+- コンポーネント階層
+- 状態管理の仕様
+- UIコンポーネント仕様
+
+### 14.3 API仕様
+
+**ドキュメント**: [docs/api.md](./docs/api.md)
+
+- IPC API完全仕様
+- 全エンドポイントのリクエスト/レスポンス型定義
+- エラーハンドリング
+- 使用例とコード例
+
+### 14.4 テスト仕様
+
+**ドキュメント**: [docs/test.md](./docs/test.md)
+
+- テスト戦略とカバレッジ目標
+- Unit Test、Integration Test、E2E Testのケース一覧
+- テストユーティリティとモックデータ
+- CI/CD統合
+
+### 14.5 データベースマイグレーション
+
+**ドキュメント**: [docs/database-migrations.md](./docs/database-migrations.md)
+
+- マイグレーション戦略
+- ファイル命名規則と作成手順
+- ベストプラクティス
+- トラブルシューティング
+
+---
+
 **最終更新**: 2026-01-03
-**バージョン**: 1.1
+**バージョン**: 1.2
