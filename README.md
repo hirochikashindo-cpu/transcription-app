@@ -38,11 +38,40 @@
 
 ## セットアップ
 
-### 前提条件
+### 事前要件
 
-- Node.js 18.x 以上
-- npm または pnpm
-- ffmpeg (音声処理用)
+このアプリケーションを実行する前に、以下がインストールされている必要があります：
+
+- **Node.js**: 18.x 以上
+- **npm** または **pnpm**
+- **FFmpeg**: 音声処理に必須（下記参照）
+
+#### FFmpegのインストール
+
+このアプリケーションは音声処理にFFmpegを使用します。以下の手順でインストールしてください：
+
+**macOS:**
+```bash
+brew install ffmpeg
+```
+
+**Windows:**
+1. https://ffmpeg.org/download.html からダウンロード
+2. ダウンロードしたファイルを解凍
+3. `bin`フォルダをPATHに追加
+
+**Linux (Ubuntu/Debian):**
+```bash
+sudo apt-get update
+sudo apt-get install ffmpeg
+```
+
+**インストール確認:**
+```bash
+ffmpeg -version
+```
+
+正常にインストールされている場合、FFmpegのバージョン情報が表示されます。
 
 ### インストール
 
@@ -75,21 +104,6 @@ npm run setup
 ```env
 OPENAI_API_KEY=your_openai_api_key_here
 ANTHROPIC_API_KEY=your_anthropic_api_key_here  # Phase 3で使用
-```
-
-### FFmpegのインストール
-
-#### macOS
-```bash
-brew install ffmpeg
-```
-
-#### Windows
-[FFmpeg公式サイト](https://ffmpeg.org/download.html)からダウンロードし、PATHを通す
-
-#### Linux
-```bash
-sudo apt-get install ffmpeg
 ```
 
 ## コード品質ガードレール
