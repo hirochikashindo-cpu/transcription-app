@@ -21,7 +21,9 @@ export class ExportService {
     const db = databaseService.getDatabase()
 
     // プロジェクト情報を取得
-    const project = db.prepare('SELECT * FROM projects WHERE id = ?').get(projectId) as ProjectRow | undefined
+    const project = db.prepare('SELECT * FROM projects WHERE id = ?').get(projectId) as
+      | ProjectRow
+      | undefined
 
     if (!project) {
       throw new Error(`Project not found: ${projectId}`)
@@ -90,7 +92,9 @@ export class ExportService {
     const db = databaseService.getDatabase()
 
     // プロジェクト情報を取得
-    const project = db.prepare('SELECT * FROM projects WHERE id = ?').get(projectId) as ProjectRow | undefined
+    const project = db.prepare('SELECT * FROM projects WHERE id = ?').get(projectId) as
+      | ProjectRow
+      | undefined
 
     if (!project) {
       throw new Error(`Project not found: ${projectId}`)

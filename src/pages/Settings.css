@@ -130,7 +130,9 @@
   border-radius: 6px;
   background-color: var(--bg-primary, #ffffff);
   color: var(--text-primary, #24292e);
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 .form-input:focus {

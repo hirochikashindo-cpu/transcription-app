@@ -34,7 +34,7 @@ export function TranscriptionDetail() {
 
     try {
       // プロジェクト情報を取得
-      const foundProject = projects.find(p => p.id === projectId)
+      const foundProject = projects.find((p) => p.id === projectId)
       if (!foundProject) {
         const fetchedProject = await window.electronAPI.project.findById(projectId)
         setProject(fetchedProject)
@@ -149,9 +149,7 @@ export function TranscriptionDetail() {
         </div>
         <div className="info-card">
           <span className="info-label">セグメント数</span>
-          <span className="info-value">
-            {transcription?.segments?.length || 0} 件
-          </span>
+          <span className="info-value">{transcription?.segments?.length || 0} 件</span>
         </div>
       </div>
 
@@ -166,17 +164,12 @@ export function TranscriptionDetail() {
         <div className="transcription-content">
           <section className="full-text-section">
             <h2>全文</h2>
-            <div className="full-text-content">
-              {transcription.content}
-            </div>
+            <div className="full-text-content">{transcription.content}</div>
           </section>
 
           <section className="segments-section">
             <h2>セグメント</h2>
-            <SegmentList
-              segments={transcription.segments || []}
-              onUpdate={handleSegmentUpdate}
-            />
+            <SegmentList segments={transcription.segments || []} onUpdate={handleSegmentUpdate} />
           </section>
         </div>
       )}

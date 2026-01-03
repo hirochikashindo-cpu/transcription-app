@@ -16,7 +16,7 @@ export function ProjectCard({ project, onDelete }: ProjectCardProps) {
       month: '2-digit',
       day: '2-digit',
       hour: '2-digit',
-      minute: '2-digit'
+      minute: '2-digit',
     })
   }
 
@@ -37,7 +37,7 @@ export function ProjectCard({ project, onDelete }: ProjectCardProps) {
       pending: { label: '待機中', className: 'status-pending' },
       processing: { label: '処理中', className: 'status-processing' },
       completed: { label: '完了', className: 'status-completed' },
-      failed: { label: '失敗', className: 'status-failed' }
+      failed: { label: '失敗', className: 'status-failed' },
     }
     return badges[status]
   }
@@ -48,14 +48,10 @@ export function ProjectCard({ project, onDelete }: ProjectCardProps) {
     <div className="project-card" onClick={() => navigate(`/project/${project.id}`)}>
       <div className="project-card-header">
         <h3 className="project-card-title">{project.title}</h3>
-        <span className={`project-card-status ${statusBadge.className}`}>
-          {statusBadge.label}
-        </span>
+        <span className={`project-card-status ${statusBadge.className}`}>{statusBadge.label}</span>
       </div>
 
-      {project.description && (
-        <p className="project-card-description">{project.description}</p>
-      )}
+      {project.description && <p className="project-card-description">{project.description}</p>}
 
       <div className="project-card-info">
         <div className="info-item">

@@ -21,7 +21,7 @@ global.window.electronAPI = {
   ping: vi.fn(() => Promise.resolve('pong')),
   project: {
     create: vi.fn(),
-    findAll: vi.fn(),
+    findAll: vi.fn(() => Promise.resolve([])),
     findById: vi.fn(),
     update: vi.fn(),
     delete: vi.fn(),
@@ -43,5 +43,8 @@ global.window.electronAPI = {
   settings: {
     get: vi.fn(),
     set: vi.fn(),
+    delete: vi.fn(),
+    isEncryptionAvailable: vi.fn(() => Promise.resolve(true)),
+    clearAll: vi.fn(),
   },
 }

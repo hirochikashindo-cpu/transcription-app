@@ -166,9 +166,7 @@ export class ProjectRepository {
    * @returns ステータスごとのプロジェクト数
    */
   countByStatus(): Record<string, number> {
-    const stmt = this.db.prepare(
-      'SELECT status, COUNT(*) as count FROM projects GROUP BY status'
-    )
+    const stmt = this.db.prepare('SELECT status, COUNT(*) as count FROM projects GROUP BY status')
     const rows = stmt.all() as { status: string; count: number }[]
 
     return rows.reduce(

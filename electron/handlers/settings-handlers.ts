@@ -32,19 +32,22 @@ export function registerSettingsHandlers(): void {
   /**
    * 設定値を保存
    */
-  ipcMain.handle('settings:set', async (_event, key: string, value: SettingValue): Promise<void> => {
-    const db = databaseService.getDatabase()
+  ipcMain.handle(
+    'settings:set',
+    async (_event, key: string, value: SettingValue): Promise<void> => {
+      const db = databaseService.getDatabase()
 
-    // オブジェクトの場合はJSON文字列に変換
-    const stringValue = typeof value === 'object' ? JSON.stringify(value) : String(value)
+      // オブジェクトの場合はJSON文字列に変換
+      const stringValue = typeof value === 'object' ? JSON.stringify(value) : String(value)
 
-    // UPSERT (INSERT OR REPLACE)
-    db.prepare(
-      `INSERT INTO settings (key, value, updated_at)
+      // UPSERT (INSERT OR REPLACE)
+      db.prepare(
+        `INSERT INTO settings (key, value, updated_at)
        VALUES (?, ?, CURRENT_TIMESTAMP)
        ON CONFLICT(key) DO UPDATE SET
          value = excluded.value,
-         updated_at = CURRENT_TIMESTAMP`,
-    ).run(key, stringValue)
-  })
+         updated_at = CURRENT_TIMESTAMP`
+      ).run(key, stringValue)
+    }
+  )
 }

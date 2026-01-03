@@ -123,7 +123,7 @@ export class WhisperService {
   async splitAudioFile(
     filePath: string,
     metadata: AudioMetadata,
-    onProgress?: ProgressCallback,
+    onProgress?: ProgressCallback
   ): Promise<string[]> {
     // ファイルサイズが25MB以下の場合は分割不要
     if (metadata.fileSize <= this.MAX_FILE_SIZE) {
@@ -172,7 +172,7 @@ export class WhisperService {
   async callWhisperAPI(
     filePath: string,
     language: string = 'ja',
-    retryCount: number = 0,
+    retryCount: number = 0
   ): Promise<WhisperResponse> {
     try {
       const formData = new FormData()
@@ -190,7 +190,7 @@ export class WhisperService {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
-        },
+        }
       )
 
       return response.data
@@ -203,7 +203,9 @@ export class WhisperService {
       }
 
       if (axios.isAxiosError(error)) {
-        throw new Error(`Whisper API error: ${error.response?.data?.error?.message || error.message}`)
+        throw new Error(
+          `Whisper API error: ${error.response?.data?.error?.message || error.message}`
+        )
       }
       throw error
     }
@@ -212,7 +214,10 @@ export class WhisperService {
   /**
    * 分割結果をマージ
    */
-  mergeTranscriptionResults(results: WhisperResponse[], timeOffsets: number[]): TranscriptionResult {
+  mergeTranscriptionResults(
+    results: WhisperResponse[],
+    timeOffsets: number[]
+  ): TranscriptionResult {
     let fullText = ''
     const allSegments: TranscriptionResult['segments'] = []
     let sequenceNumber = 0
@@ -249,7 +254,7 @@ export class WhisperService {
   async transcribe(
     filePath: string,
     language: string = 'ja',
-    onProgress?: ProgressCallback,
+    onProgress?: ProgressCallback
   ): Promise<TranscriptionResult> {
     try {
       // 1. メタデータ取得
@@ -269,7 +274,7 @@ export class WhisperService {
 
       for (let i = 0; i < chunks.length; i++) {
         if (onProgress) {
-          const progress = 15 + ((i / chunks.length) * 70) // 15-85% for API calls
+          const progress = 15 + (i / chunks.length) * 70 // 15-85% for API calls
           onProgress(progress, `Transcribing chunk ${i + 1}/${chunks.length}...`)
         }
 

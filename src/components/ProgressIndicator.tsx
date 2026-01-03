@@ -54,10 +54,7 @@ export function ProgressIndicator() {
       </div>
 
       <div className="progress-bar-container">
-        <div
-          className="progress-bar"
-          style={{ width: `${progress}%` }}
-        />
+        <div className="progress-bar" style={{ width: `${progress}%` }} />
       </div>
 
       {error && (

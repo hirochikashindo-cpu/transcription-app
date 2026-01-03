@@ -50,10 +50,7 @@ export function ExportMenu({ projectId, disabled = false }: ExportMenuProps) {
         <>
           <div className="export-menu-backdrop" onClick={() => setIsOpen(false)} />
           <div className="export-menu-dropdown">
-            <button
-              className="export-option"
-              onClick={() => handleExport('json')}
-            >
+            <button className="export-option" onClick={() => handleExport('json')}>
               <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                 <path
                   fillRule="evenodd"
@@ -67,10 +64,7 @@ export function ExportMenu({ projectId, disabled = false }: ExportMenuProps) {
               </div>
             </button>
 
-            <button
-              className="export-option"
-              onClick={() => handleExport('markdown')}
-            >
+            <button className="export-option" onClick={() => handleExport('markdown')}>
               <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
                 <path
                   fillRule="evenodd"

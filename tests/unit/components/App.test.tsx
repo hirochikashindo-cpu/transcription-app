@@ -8,8 +8,8 @@ describe('App Component', () => {
     expect(screen.getByRole('heading', { name: /Transcription App/i })).toBeInTheDocument()
   })
 
-  it('should display welcome message', () => {
+  it('should display subtitle', () => {
     render(<App />)
-    expect(screen.getByText(/Welcome to the Audio Transcription Application/i)).toBeInTheDocument()
+    expect(screen.getByText(/音声文字起こしアプリケーション/i)).toBeInTheDocument()
   })
 })

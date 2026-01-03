@@ -19,6 +19,6 @@ export function registerFileHandlers(): void {
     'file:validate',
     async (_event, filePath: string): Promise<{ valid: boolean; error?: string }> => {
       return await fileService.validateAudioFile(filePath)
-    },
+    }
   )
 }

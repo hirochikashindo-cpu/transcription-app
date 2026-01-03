@@ -2,7 +2,12 @@ import { ipcMain } from 'electron'
 import { v4 as uuidv4 } from 'uuid'
 import { databaseService } from '../services/database/database-service'
 import { fileService } from '../services/file/file-service'
-import type { Project, CreateProjectData, UpdateProjectData, ProjectFilter } from '@shared/types/electron'
+import type {
+  Project,
+  CreateProjectData,
+  UpdateProjectData,
+  ProjectFilter,
+} from '@shared/types/electron'
 import type { ProjectRow } from '@shared/types/database'
 
 /**
@@ -25,7 +30,7 @@ export function registerProjectHandlers(): void {
       `INSERT INTO projects (
         id, title, description, created_at, updated_at, status,
         audio_file_path, audio_file_name, audio_file_size, audio_duration, audio_format
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     ).run(
       projectId,
       data.title,
@@ -37,7 +42,7 @@ export function registerProjectHandlers(): void {
       fileInfo.name,
       fileInfo.size,
       data.audio_duration || null,
-      fileInfo.extension,
+      fileInfo.extension
     )
 
     const project: Project = {
@@ -166,7 +171,9 @@ export function registerProjectHandlers(): void {
       db.prepare(query).run(...params)
 
       // 更新されたプロジェクトを取得
-      const row = db.prepare('SELECT * FROM projects WHERE id = ?').get(id) as ProjectRow | undefined
+      const row = db.prepare('SELECT * FROM projects WHERE id = ?').get(id) as
+        | ProjectRow
+        | undefined
 
       if (!row) {
         throw new Error(`Project not found: ${id}`)
@@ -187,7 +194,7 @@ export function registerProjectHandlers(): void {
       }
 
       return project
-    },
+    }
   )
 
   /**

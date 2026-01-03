@@ -6,7 +6,7 @@
 
 set -e
 
-REPO_OWNER="hirochikashindo"
+REPO_OWNER="hirochikashindo-cpu"
 REPO_NAME="transcription-app"
 ISSUES_DIR=".github/issues"
 

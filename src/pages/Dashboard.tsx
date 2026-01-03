@@ -62,11 +62,7 @@ export function Dashboard() {
             <h1>Transcription App</h1>
             <p className="dashboard-subtitle">音声文字起こしアプリケーション</p>
           </div>
-          <button
-            className="btn-settings"
-            onClick={() => navigate('/settings')}
-            title="設定"
-          >
+          <button className="btn-settings" onClick={() => navigate('/settings')} title="設定">
             <svg width="24" height="24" viewBox="0 0 20 20" fill="currentColor">
               <path
                 fillRule="evenodd"
@@ -122,7 +118,11 @@ export function Dashboard() {
                   onClick={handleCreateAndTranscribe}
                   disabled={!projectTitle || isTranscribing || isCreating}
                 >
-                  {isCreating ? '作成中...' : isTranscribing ? '文字起こし中...' : 'プロジェクトを作成して文字起こしを開始'}
+                  {isCreating
+                    ? '作成中...'
+                    : isTranscribing
+                      ? '文字起こし中...'
+                      : 'プロジェクトを作成して文字起こしを開始'}
                 </button>
               </>
             )}

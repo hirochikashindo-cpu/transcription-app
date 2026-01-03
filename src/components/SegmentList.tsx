@@ -66,16 +66,10 @@ export function SegmentList({ segments, onUpdate }: SegmentListProps) {
                 autoFocus
               />
               <div className="segment-actions">
-                <button
-                  className="btn-primary btn-sm"
-                  onClick={() => handleSave(segment.id)}
-                >
+                <button className="btn-primary btn-sm" onClick={() => handleSave(segment.id)}>
                   保存
                 </button>
-                <button
-                  className="btn-secondary btn-sm"
-                  onClick={handleCancel}
-                >
+                <button className="btn-secondary btn-sm" onClick={handleCancel}>
                   キャンセル
                 </button>
               </div>
@@ -88,11 +82,7 @@ export function SegmentList({ segments, onUpdate }: SegmentListProps) {
                   信頼度: {Math.round(segment.confidence * 100)}%
                 </span>
               )}
-              <button
-                className="btn-edit"
-                onClick={() => handleEdit(segment)}
-                title="編集"
-              >
+              <button className="btn-edit" onClick={() => handleEdit(segment)} title="編集">
                 <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
                   <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
                 </svg>

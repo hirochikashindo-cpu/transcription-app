@@ -216,11 +216,7 @@ export function Settings() {
             </button>
 
             {hasExistingKey && (
-              <button
-                className="btn-danger"
-                onClick={handleDelete}
-                disabled={isSaving}
-              >
+              <button className="btn-danger" onClick={handleDelete} disabled={isSaving}>
                 削除
               </button>
             )}

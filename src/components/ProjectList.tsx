@@ -12,7 +12,7 @@ export function ProjectList() {
     setSearchTerm(value)
     setFilter({
       ...filter,
-      search: value || undefined
+      search: value || undefined,
     })
   }
 
@@ -20,7 +20,8 @@ export function ProjectList() {
     setStatusFilter(value)
     setFilter({
       ...filter,
-      status: value === 'all' ? undefined : (value as 'pending' | 'processing' | 'completed' | 'failed')
+      status:
+        value === 'all' ? undefined : (value as 'pending' | 'processing' | 'completed' | 'failed'),
     })
   }
 
@@ -87,11 +88,7 @@ export function ProjectList() {
       {!isLoading && projects.length > 0 && (
         <div className="project-list-grid">
           {projects.map((project) => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              onDelete={deleteProject}
-            />
+            <ProjectCard key={project.id} project={project} onDelete={deleteProject} />
           ))}
         </div>
       )}

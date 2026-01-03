@@ -21,7 +21,9 @@
   background-color: var(--bg-secondary, #f8f9fa);
   border: 1px solid var(--border-color, #e1e4e8);
   border-radius: 8px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 .segment-item:hover {
@@ -97,7 +99,9 @@
   background-color: var(--bg-primary, #ffffff);
   resize: vertical;
   min-height: 80px;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 .segment-textarea:focus {

@@ -33,7 +33,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'Failed to fetch projects',
-        isLoading: false
+        isLoading: false,
       })
     }
   },
@@ -61,7 +61,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'Failed to create project',
-        isLoading: false
+        isLoading: false,
       })
       throw error
     }
@@ -76,7 +76,7 @@ export const useProjectStore = create<ProjectState>((set, get) => ({
     } catch (error) {
       set({
         error: error instanceof Error ? error.message : 'Failed to delete project',
-        isLoading: false
+        isLoading: false,
       })
       throw error
     }

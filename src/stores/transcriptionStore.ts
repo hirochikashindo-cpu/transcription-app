@@ -37,8 +37,8 @@ export const useTranscriptionStore = create<TranscriptionState>((set) => ({
           projectId,
           status: 'failed',
           progress: 0,
-          error: error instanceof Error ? error.message : 'Transcription failed'
-        }
+          error: error instanceof Error ? error.message : 'Transcription failed',
+        },
       })
       unsubscribe()
       throw error
