@@ -100,6 +100,9 @@ export interface ElectronAPI {
   }
   settings: {
     get: (key: string) => Promise<SettingValue>
-    set: (key: string, value: SettingValue) => Promise<void>
+    set: (key: string, value: SettingValue) => Promise<{ success: boolean }>
+    delete: (key: string) => Promise<{ success: boolean }>
+    isEncryptionAvailable: () => Promise<boolean>
+    clearAll: () => Promise<{ success: boolean }>
   }
 }

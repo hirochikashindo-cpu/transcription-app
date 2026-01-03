@@ -58,6 +58,9 @@ contextBridge.exposeInMainWorld(
     settings: {
       get: (key: string) => ipcRenderer.invoke('settings:get', key),
       set: (key: string, value: SettingValue) => ipcRenderer.invoke('settings:set', key, value),
+      delete: (key: string) => ipcRenderer.invoke('settings:delete', key),
+      isEncryptionAvailable: () => ipcRenderer.invoke('settings:isEncryptionAvailable'),
+      clearAll: () => ipcRenderer.invoke('settings:clearAll'),
     },
   } satisfies ElectronAPI,
 )

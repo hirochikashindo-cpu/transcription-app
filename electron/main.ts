@@ -1,6 +1,7 @@
 import { app, BrowserWindow, ipcMain, dialog } from 'electron'
 import path from 'path'
 import { databaseService } from './services/database/database-service'
+import { configService } from './services/config/config-service'
 import { registerProjectHandlers } from './handlers/project-handlers'
 import { registerTranscriptionHandlers } from './handlers/transcription-handlers'
 import { registerFileHandlers } from './handlers/file-handlers'
@@ -59,6 +60,14 @@ app.whenReady().then(() => {
     )
     app.quit()
     return
+  }
+
+  // Initialize config service
+  try {
+    configService.initialize()
+    console.log('Config service initialized successfully')
+  } catch (error) {
+    console.error('Failed to initialize config service:', error)
   }
 
   // Register IPC handlers
