@@ -11,6 +11,7 @@ export interface Project {
   audio_file_size?: number
   audio_duration?: number
   audio_format?: string
+  processing_time?: number
 }
 
 export interface CreateProjectData {

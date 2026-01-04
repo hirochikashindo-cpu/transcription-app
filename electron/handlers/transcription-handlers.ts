@@ -24,6 +24,9 @@ export function registerTranscriptionHandlers(): void {
       }
 
       try {
+        // 処理開始時刻を記録
+        const startTime = Date.now()
+
         // プロジェクトのステータスを「処理中」に更新
         databaseService.projects.update(projectId, { status: 'processing' })
 
@@ -41,6 +44,9 @@ export function registerTranscriptionHandlers(): void {
 
         // 文字起こし実行（ローカル）
         const result = await whisperLocalService.transcribe(filePath, 'ja', onProgress)
+
+        // 処理時間を計算（秒単位）
+        const processingTime = (Date.now() - startTime) / 1000
 
         // 文字起こし結果をデータベースに保存
         const transcription = databaseService.transcriptions.create({
@@ -61,12 +67,12 @@ export function registerTranscriptionHandlers(): void {
 
         databaseService.segments.createBatch(segmentData)
 
-        // プロジェクトのステータスを「完了」に更新し、音声の長さを保存
-        // Note: UpdateProjectDataにaudio_durationがないため、直接SQLで更新
+        // プロジェクトのステータスを「完了」に更新し、音声の長さと処理時間を保存
+        // Note: UpdateProjectDataにaudio_duration, processing_timeがないため、直接SQLで更新
         const db = databaseService.getDatabase()
         db.prepare(
-          'UPDATE projects SET status = ?, audio_duration = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
-        ).run('completed', result.duration, projectId)
+          'UPDATE projects SET status = ?, audio_duration = ?, processing_time = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
+        ).run('completed', result.duration, processingTime, projectId)
 
         // 完了通知
         const completedProgress: TranscriptionProgress = {

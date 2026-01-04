@@ -32,6 +32,20 @@ export function ProjectCard({ project, onDelete }: ProjectCardProps) {
     return `${minutes}:${String(seconds).padStart(2, '0')}`
   }
 
+  const formatProcessingTime = (processingTime?: number) => {
+    if (!processingTime) return ''
+    const hours = Math.floor(processingTime / 3600)
+    const minutes = Math.floor((processingTime % 3600) / 60)
+    const seconds = Math.floor(processingTime % 60)
+
+    if (hours > 0) {
+      return `${hours}時間${minutes}分${seconds}秒`
+    } else if (minutes > 0) {
+      return `${minutes}分${seconds}秒`
+    }
+    return `${seconds}秒`
+  }
+
   const getStatusBadge = (status: Project['status']) => {
     const badges = {
       pending: { label: '待機中', className: 'status-pending' },
@@ -60,7 +74,10 @@ export function ProjectCard({ project, onDelete }: ProjectCardProps) {
         </div>
         <div className="info-item">
           <span className="info-label">長さ:</span>
-          <span className="info-value">{formatDuration(project.audio_duration)}</span>
+          <span className="info-value">
+            {formatDuration(project.audio_duration)}
+            {project.processing_time && ` (処理時間: ${formatProcessingTime(project.processing_time)})`}
+          </span>
         </div>
         <div className="info-item">
           <span className="info-label">作成日:</span>
