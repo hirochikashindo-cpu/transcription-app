@@ -6,6 +6,8 @@ import { ProjectRepository } from './repositories/project-repository'
 import { TranscriptionRepository } from './repositories/transcription-repository'
 import { SegmentRepository } from './repositories/segment-repository'
 import { SettingsRepository } from './repositories/settings-repository'
+import { SpeakerRepository } from './repositories/speaker-repository'
+import { DictionaryRepository } from './repositories/dictionary-repository'
 
 /**
  * DatabaseService
@@ -25,6 +27,8 @@ export class DatabaseService {
   public transcriptions: TranscriptionRepository | null = null
   public segments: SegmentRepository | null = null
   public settings: SettingsRepository | null = null
+  public speakers: SpeakerRepository | null = null
+  public dictionaries: DictionaryRepository | null = null
 
   constructor() {
     // ユーザーデータディレクトリにデータベースを配置
@@ -57,6 +61,8 @@ export class DatabaseService {
     this.transcriptions = new TranscriptionRepository(this.db)
     this.segments = new SegmentRepository(this.db)
     this.settings = new SettingsRepository(this.db)
+    this.speakers = new SpeakerRepository(this.db)
+    this.dictionaries = new DictionaryRepository(this.db)
 
     console.log('Database initialized successfully')
   }
@@ -167,6 +173,8 @@ export class DatabaseService {
       this.transcriptions = null
       this.segments = null
       this.settings = null
+      this.speakers = null
+      this.dictionaries = null
 
       console.log('Database closed')
     }

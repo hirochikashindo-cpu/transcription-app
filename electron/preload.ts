@@ -6,6 +6,11 @@ import type {
   TranscriptionProgress,
   SettingValue,
   ElectronAPI,
+  CreateSpeakerData,
+  UpdateSpeakerData,
+  CreateDictionaryEntryData,
+  UpdateDictionaryEntryData,
+  DictionaryFilter,
 } from '@shared/types/electron'
 
 // Expose protected methods that allow the renderer process to use
@@ -59,6 +64,29 @@ contextBridge.exposeInMainWorld('electronAPI', {
     delete: (key: string) => ipcRenderer.invoke('settings:delete', key),
     isEncryptionAvailable: () => ipcRenderer.invoke('settings:isEncryptionAvailable'),
     clearAll: () => ipcRenderer.invoke('settings:clearAll'),
+  },
+
+  // Speaker APIs
+  speaker: {
+    create: (data: CreateSpeakerData) => ipcRenderer.invoke('speaker:create', data),
+    findByProjectId: (projectId: string) => ipcRenderer.invoke('speaker:findByProjectId', projectId),
+    findById: (id: string) => ipcRenderer.invoke('speaker:findById', id),
+    update: (id: string, updates: UpdateSpeakerData) =>
+      ipcRenderer.invoke('speaker:update', id, updates),
+    delete: (id: string) => ipcRenderer.invoke('speaker:delete', id),
+  },
+
+  // Dictionary APIs
+  dictionary: {
+    create: (data: CreateDictionaryEntryData) => ipcRenderer.invoke('dictionary:create', data),
+    findAll: (filter?: DictionaryFilter) => ipcRenderer.invoke('dictionary:findAll', filter),
+    findById: (id: string) => ipcRenderer.invoke('dictionary:findById', id),
+    update: (id: string, updates: UpdateDictionaryEntryData) =>
+      ipcRenderer.invoke('dictionary:update', id, updates),
+    delete: (id: string) => ipcRenderer.invoke('dictionary:delete', id),
+    incrementUsage: (id: string) => ipcRenderer.invoke('dictionary:incrementUsage', id),
+    importFromCsv: () => ipcRenderer.invoke('dictionary:importFromCsv'),
+    exportToCsv: () => ipcRenderer.invoke('dictionary:exportToCsv'),
   },
 } satisfies ElectronAPI)
 

@@ -93,6 +93,57 @@ export interface TranscriptionProgress {
   error?: string
 }
 
+// Speaker types (Phase 2)
+export interface Speaker {
+  id: string
+  project_id: string
+  name: string
+  custom_name?: string
+  color: string
+  created_at: Date
+  updated_at: Date
+}
+
+export interface CreateSpeakerData {
+  project_id: string
+  name: string
+  custom_name?: string
+  color: string
+}
+
+export interface UpdateSpeakerData {
+  custom_name?: string
+  color?: string
+}
+
+// Dictionary types (Phase 2)
+export interface DictionaryEntry {
+  id: string
+  word: string
+  reading?: string
+  category?: string
+  usage_count: number
+  created_at: Date
+  updated_at: Date
+}
+
+export interface CreateDictionaryEntryData {
+  word: string
+  reading?: string
+  category?: string
+}
+
+export interface UpdateDictionaryEntryData {
+  word?: string
+  reading?: string
+  category?: string
+}
+
+export interface DictionaryFilter {
+  category?: string
+  search?: string
+}
+
 // File validation types
 export interface FileValidationResult {
   valid: boolean
@@ -132,5 +183,22 @@ export interface ElectronAPI {
     delete: (key: string) => Promise<{ success: boolean }>
     isEncryptionAvailable: () => Promise<boolean>
     clearAll: () => Promise<{ success: boolean }>
+  }
+  speaker: {
+    create: (data: CreateSpeakerData) => Promise<Speaker>
+    findByProjectId: (projectId: string) => Promise<Speaker[]>
+    findById: (id: string) => Promise<Speaker>
+    update: (id: string, updates: UpdateSpeakerData) => Promise<Speaker>
+    delete: (id: string) => Promise<void>
+  }
+  dictionary: {
+    create: (data: CreateDictionaryEntryData) => Promise<DictionaryEntry>
+    findAll: (filter?: DictionaryFilter) => Promise<DictionaryEntry[]>
+    findById: (id: string) => Promise<DictionaryEntry>
+    update: (id: string, updates: UpdateDictionaryEntryData) => Promise<DictionaryEntry>
+    delete: (id: string) => Promise<void>
+    incrementUsage: (id: string) => Promise<DictionaryEntry>
+    importFromCsv: () => Promise<{ imported: number; errors: string[] }>
+    exportToCsv: () => Promise<void>
   }
 }

@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { DictionaryManager } from '../components/DictionaryManager'
 import './Settings.css'
+
+type SettingsTab = 'api-keys' | 'dictionary'
 
 export function Settings() {
   const navigate = useNavigate()
+  const [activeTab, setActiveTab] = useState<SettingsTab>('api-keys')
   const [openaiKey, setOpenaiKey] = useState('')
   const [isLoading, setIsLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
@@ -136,7 +140,25 @@ export function Settings() {
         <h1>設定</h1>
       </header>
 
+      <div className="settings-tabs">
+        <button
+          className={`tab-button ${activeTab === 'api-keys' ? 'active' : ''}`}
+          onClick={() => setActiveTab('api-keys')}
+        >
+          API Keys
+        </button>
+        <button
+          className={`tab-button ${activeTab === 'dictionary' ? 'active' : ''}`}
+          onClick={() => setActiveTab('dictionary')}
+        >
+          カスタム辞書
+        </button>
+      </div>
+
       <div className="settings-content">
+        {activeTab === 'dictionary' && <DictionaryManager />}
+        {activeTab === 'api-keys' && (
+          <>
         <section className="settings-section">
           <h2>API Keys</h2>
 
@@ -262,6 +284,8 @@ export function Settings() {
             </ul>
           </div>
         </section>
+        </>
+        )}
       </div>
     </div>
   )

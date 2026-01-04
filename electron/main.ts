@@ -7,6 +7,8 @@ import { registerTranscriptionHandlers } from './handlers/transcription-handlers
 import { registerFileHandlers } from './handlers/file-handlers'
 import { registerExportHandlers } from './handlers/export-handlers'
 import { registerSettingsHandlers } from './handlers/settings-handlers'
+import { registerSpeakerHandlers } from './handlers/speaker-handlers'
+import { registerDictionaryHandlers } from './handlers/dictionary-handlers'
 
 // Disable GPU acceleration for better stability
 app.disableHardwareAcceleration()
@@ -78,6 +80,8 @@ app.whenReady().then(() => {
   registerFileHandlers()
   registerExportHandlers()
   registerSettingsHandlers()
+  registerSpeakerHandlers()
+  registerDictionaryHandlers()
 
   createWindow()
 

@@ -44,6 +44,38 @@
   border-color: var(--border-hover, #9ca3af);
 }
 
+/* Tabs */
+.settings-tabs {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0 2rem;
+  background-color: var(--bg-secondary, #f8f9fa);
+  border-bottom: 1px solid var(--border-color, #e1e4e8);
+  flex-shrink: 0;
+}
+
+.tab-button {
+  padding: 1rem 1.5rem;
+  background-color: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--text-secondary, #6c757d);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.tab-button:hover {
+  color: var(--text-primary, #24292e);
+  background-color: var(--bg-hover, #f3f4f6);
+}
+
+.tab-button.active {
+  color: var(--primary-color, #0366d6);
+  border-bottom-color: var(--primary-color, #0366d6);
+}
+
 /* Content */
 .settings-content {
   flex: 1;
