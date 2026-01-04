@@ -528,15 +528,18 @@ CREATE TABLE settings (
 
 ## 9. 開発ロードマップ
 
-### Phase 1: MVP (目標: 4-6週間)
+### Phase 1: MVP (完了: 2026-01-04)
 - [x] 要件定義
 - [x] アーキテクチャ設計
 - [x] プロジェクト構成
-- [ ] データベースサービス実装
-- [ ] 基本UI実装
-- [ ] Whisper API連携
-- [ ] エクスポート機能
-- [ ] テスト・バグ修正
+- [x] データベースサービス実装（Repository pattern）
+- [x] 基本UI実装（Dashboard, TranscriptionDetail, Settings）
+- [x] Whisper連携（whisper.cpp ローカル実行 + Turbo model）
+- [x] エクスポート機能（JSON, Markdown）
+- [x] プロジェクト管理（作成・削除・検索・フィルター・ソート）
+- [x] セグメント編集機能
+- [x] m4a自動変換機能
+- [x] E2Eテスト・バグ修正
 
 ### Phase 2: 拡張機能 (目標: 3-4週間)
 - [ ] 話者認識機能

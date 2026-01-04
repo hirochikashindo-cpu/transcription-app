@@ -7,6 +7,8 @@ export function ProjectList() {
   const { projects, filter, setFilter, deleteProject, isLoading } = useProjectStore()
   const [searchTerm, setSearchTerm] = useState(filter.search || '')
   const [statusFilter, setStatusFilter] = useState<string>(filter.status || 'all')
+  const [sortBy, setSortBy] = useState(filter.sortBy || 'created_at')
+  const [sortOrder, setSortOrder] = useState(filter.sortOrder || 'desc')
 
   const handleSearchChange = (value: string) => {
     setSearchTerm(value)
@@ -22,6 +24,18 @@ export function ProjectList() {
       ...filter,
       status:
         value === 'all' ? undefined : (value as 'pending' | 'processing' | 'completed' | 'failed'),
+    })
+  }
+
+  const handleSortChange = (newSortBy: string, newSortOrder?: string) => {
+    const updatedSortBy = newSortBy as 'created_at' | 'updated_at' | 'title'
+    const updatedSortOrder = newSortOrder || sortOrder
+    setSortBy(updatedSortBy)
+    if (newSortOrder) setSortOrder(newSortOrder as 'asc' | 'desc')
+    setFilter({
+      ...filter,
+      sortBy: updatedSortBy,
+      sortOrder: updatedSortOrder as 'asc' | 'desc',
     })
   }
 
@@ -52,6 +66,29 @@ export function ProjectList() {
               <option value="processing">処理中</option>
               <option value="completed">完了</option>
               <option value="failed">失敗</option>
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <select
+              className="sort-filter"
+              value={sortBy}
+              onChange={(e) => handleSortChange(e.target.value)}
+            >
+              <option value="created_at">作成日順</option>
+              <option value="updated_at">更新日順</option>
+              <option value="title">タイトル順</option>
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <select
+              className="sort-order-filter"
+              value={sortOrder}
+              onChange={(e) => handleSortChange(sortBy, e.target.value)}
+            >
+              <option value="desc">降順</option>
+              <option value="asc">昇順</option>
             </select>
           </div>
         </div>

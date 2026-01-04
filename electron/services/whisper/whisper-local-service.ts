@@ -68,6 +68,51 @@ export class WhisperLocalService {
   }
 
   /**
+   * m4a形式をmp3に変換
+   *
+   * @param m4aPath - m4aファイルパス
+   * @returns 変換後のmp3ファイルパス
+   */
+  private async convertM4AtoMP3(m4aPath: string): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const outputPath = m4aPath.replace(/\.m4a$/i, '_converted.mp3')
+
+      const ffmpeg = spawn('ffmpeg', [
+        '-i',
+        m4aPath,
+        '-acodec',
+        'libmp3lame',
+        '-y', // 上書き
+        outputPath,
+      ])
+
+      let stderr = ''
+
+      ffmpeg.stderr.on('data', (data) => {
+        stderr += data.toString()
+      })
+
+      ffmpeg.on('close', (code) => {
+        if (code !== 0) {
+          reject(new Error(`ffmpeg failed with code ${code}: ${stderr}`))
+          return
+        }
+
+        if (!fs.existsSync(outputPath)) {
+          reject(new Error(`Converted file not found: ${outputPath}`))
+          return
+        }
+
+        resolve(outputPath)
+      })
+
+      ffmpeg.on('error', (error) => {
+        reject(new Error(`ffmpeg error: ${error.message}`))
+      })
+    })
+  }
+
+  /**
    * 音声ファイルを文字起こし
    *
    * @param filePath - 音声ファイルパス
@@ -85,14 +130,26 @@ export class WhisperLocalService {
       throw new Error(`Audio file not found: ${filePath}`)
     }
 
+    let actualFilePath = filePath
+    let convertedFilePath: string | null = null
+
     try {
+      // m4a形式の場合、mp3に変換
+      const ext = path.extname(filePath).toLowerCase()
+      if (ext === '.m4a') {
+        if (onProgress) onProgress(0, 'Converting m4a to mp3...')
+        convertedFilePath = await this.convertM4AtoMP3(filePath)
+        actualFilePath = convertedFilePath
+        if (onProgress) onProgress(5, 'Conversion completed')
+      }
+
       // モデルの準備
-      if (onProgress) onProgress(0, 'Preparing model...')
+      if (onProgress) onProgress(ext === '.m4a' ? 5 : 0, 'Preparing model...')
       const modelPath = await this.ensureModelDownloaded(this.defaultModel, onProgress)
 
       // whisper-cliを実行
       if (onProgress) onProgress(10, 'Starting transcription...')
-      const result = await this.runWhisperCLI(filePath, modelPath, language, onProgress)
+      const result = await this.runWhisperCLI(actualFilePath, modelPath, language, onProgress)
 
       if (onProgress) onProgress(100, 'Transcription completed!')
       return result
@@ -101,6 +158,15 @@ export class WhisperLocalService {
         throw new Error(`Transcription failed: ${error.message}`)
       }
       throw error
+    } finally {
+      // 変換した一時ファイルを削除
+      if (convertedFilePath && fs.existsSync(convertedFilePath)) {
+        try {
+          fs.unlinkSync(convertedFilePath)
+        } catch (err) {
+          console.error('Failed to delete temporary file:', err)
+        }
+      }
     }
   }
 

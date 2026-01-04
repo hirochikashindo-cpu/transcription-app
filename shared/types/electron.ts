@@ -32,6 +32,8 @@ export interface UpdateProjectData {
 export interface ProjectFilter {
   status?: Project['status']
   search?: string
+  sortBy?: 'created_at' | 'updated_at' | 'title'
+  sortOrder?: 'asc' | 'desc'
 }
 
 // Transcription types

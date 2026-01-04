@@ -76,7 +76,10 @@ export class ProjectRepository {
       params.push(searchParam, searchParam)
     }
 
-    query += ' ORDER BY created_at DESC'
+    // ソート
+    const sortBy = filter?.sortBy || 'created_at'
+    const sortOrder = filter?.sortOrder || 'desc'
+    query += ` ORDER BY ${sortBy} ${sortOrder.toUpperCase()}`
 
     const stmt = this.db.prepare(query)
     const rows = stmt.all(...params) as Array<Record<string, unknown>>
