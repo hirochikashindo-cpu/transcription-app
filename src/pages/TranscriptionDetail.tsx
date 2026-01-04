@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useProjectStore } from '../stores/projectStore'
-import type { Transcription, Project } from '@shared/types/electron'
+import type { Transcription, Project, Speaker } from '@shared/types/electron'
 import { ExportMenu } from '../components/ExportMenu'
 import { SegmentList } from '../components/SegmentList'
+import { SpeakerList } from '../components/SpeakerList'
 import './TranscriptionDetail.css'
 
 export function TranscriptionDetail() {
@@ -13,6 +14,8 @@ export function TranscriptionDetail() {
 
   const [project, setProject] = useState<Project | null>(null)
   const [transcription, setTranscription] = useState<Transcription | null>(null)
+  const [speakers, setSpeakers] = useState<Speaker[]>([])
+  const [selectedSpeakerId, setSelectedSpeakerId] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -45,10 +48,28 @@ export function TranscriptionDetail() {
       // 文字起こしデータを取得
       const transcriptionData = await window.electronAPI.transcription.getByProjectId(projectId)
       setTranscription(transcriptionData)
+
+      // 話者情報を取得
+      const speakersData = await window.electronAPI.speaker.findByProjectId(projectId)
+      setSpeakers(speakersData)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load transcription')
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleSpeakerUpdate = async (speakerId: string, customName: string, color: string) => {
+    try {
+      await window.electronAPI.speaker.update(speakerId, { custom_name: customName, color })
+      // 更新後、話者リストを再読み込み
+      if (projectId) {
+        const speakersData = await window.electronAPI.speaker.findByProjectId(projectId)
+        setSpeakers(speakersData)
+      }
+    } catch (err) {
+      console.error('Failed to update speaker:', err)
+      alert('話者の更新に失敗しました')
     }
   }
 
@@ -162,15 +183,35 @@ export function TranscriptionDetail() {
 
       {transcription && (
         <div className="transcription-content">
-          <section className="full-text-section">
-            <h2>全文</h2>
-            <div className="full-text-content">{transcription.content}</div>
-          </section>
+          <div className="content-with-sidebar">
+            <div className="main-content">
+              <section className="full-text-section">
+                <h2>全文</h2>
+                <div className="full-text-content">{transcription.content}</div>
+              </section>
 
-          <section className="segments-section">
-            <h2>セグメント</h2>
-            <SegmentList segments={transcription.segments || []} onUpdate={handleSegmentUpdate} />
-          </section>
+              <section className="segments-section">
+                <h2>セグメント</h2>
+                <SegmentList
+                  segments={transcription.segments || []}
+                  speakers={speakers}
+                  selectedSpeakerId={selectedSpeakerId}
+                  onUpdate={handleSegmentUpdate}
+                />
+              </section>
+            </div>
+
+            {speakers.length > 0 && (
+              <aside className="sidebar">
+                <SpeakerList
+                  speakers={speakers}
+                  selectedSpeakerId={selectedSpeakerId}
+                  onSpeakerSelect={setSelectedSpeakerId}
+                  onSpeakerUpdate={handleSpeakerUpdate}
+                />
+              </aside>
+            )}
+          </div>
         </div>
       )}
     </div>

@@ -96,6 +96,24 @@
   padding: 2rem;
 }
 
+.content-with-sidebar {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 2rem;
+  align-items: start;
+}
+
+.main-content {
+  min-width: 0;
+}
+
+.sidebar {
+  position: sticky;
+  top: 2rem;
+  max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+}
+
 .full-text-section,
 .segments-section {
   margin-bottom: 3rem;

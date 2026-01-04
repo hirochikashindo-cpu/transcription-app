@@ -1,13 +1,18 @@
 import { useState } from 'react'
-import type { Segment } from '@shared/types/electron'
+import type { Segment, Speaker } from '@shared/types/electron'
 import './SegmentList.css'
 
 interface SegmentListProps {
   segments: Segment[]
+  speakers?: Speaker[]
+  selectedSpeakerId?: string | null
   onUpdate: (segmentId: string, newText: string) => Promise<void>
 }
 
-export function SegmentList({ segments, onUpdate }: SegmentListProps) {
+export function SegmentList({ segments, speakers = [], selectedSpeakerId, onUpdate }: SegmentListProps) {
+  const getSpeakerForSegment = (segment: Segment): Speaker | undefined => {
+    return speakers.find((s) => s.id === segment.speaker_id)
+  }
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editText, setEditText] = useState('')
 
@@ -48,12 +53,32 @@ export function SegmentList({ segments, onUpdate }: SegmentListProps) {
     )
   }
 
+  // フィルタリング処理
+  const filteredSegments = selectedSpeakerId
+    ? segments.filter((seg) => seg.speaker_id === selectedSpeakerId)
+    : segments
+
   return (
     <div className="segment-list">
-      {segments.map((segment) => (
-        <div key={segment.id} className="segment-item">
-          <div className="segment-timestamp">
-            {formatTime(segment.start_time)} - {formatTime(segment.end_time)}
+      {filteredSegments.map((segment) => {
+        const speaker = getSpeakerForSegment(segment)
+
+        return (
+        <div
+          key={segment.id}
+          className="segment-item"
+          style={speaker ? { borderLeftColor: speaker.color, borderLeftWidth: '4px' } : undefined}
+        >
+          <div className="segment-header">
+            <div className="segment-timestamp">
+              {formatTime(segment.start_time)} - {formatTime(segment.end_time)}
+            </div>
+            {speaker && (
+              <div className="segment-speaker" style={{ color: speaker.color }}>
+                <span className="speaker-dot" style={{ backgroundColor: speaker.color }} />
+                {speaker.custom_name || speaker.name}
+              </div>
+            )}
           </div>
 
           {editingId === segment.id ? (
@@ -90,7 +115,7 @@ export function SegmentList({ segments, onUpdate }: SegmentListProps) {
             </div>
           )}
         </div>
-      ))}
+      )})}
     </div>
   )
 }
