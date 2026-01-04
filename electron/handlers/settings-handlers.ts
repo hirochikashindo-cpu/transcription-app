@@ -4,29 +4,18 @@ import type { SettingValue } from '@shared/types/electron'
 
 /**
  * 設定管理のIPCハンドラー
+ * Repositoryパターンを使用
  */
 export function registerSettingsHandlers(): void {
   /**
    * 設定値を取得
    */
   ipcMain.handle('settings:get', async (_event, key: string): Promise<SettingValue> => {
-    const db = databaseService.getDatabase()
-
-    const row = db.prepare('SELECT value FROM settings WHERE key = ?').get(key) as
-      | { value: string }
-      | undefined
-
-    if (!row) {
-      return null
+    if (!databaseService.settings) {
+      throw new Error('Database not initialized')
     }
 
-    // JSONとしてパースを試みる
-    try {
-      return JSON.parse(row.value)
-    } catch {
-      // パースできない場合は文字列として返す
-      return row.value
-    }
+    return databaseService.settings.get(key)
   })
 
   /**
@@ -34,20 +23,45 @@ export function registerSettingsHandlers(): void {
    */
   ipcMain.handle(
     'settings:set',
-    async (_event, key: string, value: SettingValue): Promise<void> => {
-      const db = databaseService.getDatabase()
+    async (_event, key: string, value: SettingValue): Promise<{ success: boolean }> => {
+      if (!databaseService.settings) {
+        throw new Error('Database not initialized')
+      }
 
-      // オブジェクトの場合はJSON文字列に変換
-      const stringValue = typeof value === 'object' ? JSON.stringify(value) : String(value)
-
-      // UPSERT (INSERT OR REPLACE)
-      db.prepare(
-        `INSERT INTO settings (key, value, updated_at)
-       VALUES (?, ?, CURRENT_TIMESTAMP)
-       ON CONFLICT(key) DO UPDATE SET
-         value = excluded.value,
-         updated_at = CURRENT_TIMESTAMP`
-      ).run(key, stringValue)
+      databaseService.settings.set(key, value)
+      return { success: true }
     }
   )
+
+  /**
+   * 設定値を削除
+   */
+  ipcMain.handle('settings:delete', async (_event, key: string): Promise<{ success: boolean }> => {
+    if (!databaseService.settings) {
+      throw new Error('Database not initialized')
+    }
+
+    databaseService.settings.delete(key)
+    return { success: true }
+  })
+
+  /**
+   * 暗号化が利用可能かチェック（将来の機能）
+   */
+  ipcMain.handle('settings:isEncryptionAvailable', async (): Promise<boolean> => {
+    // Phase 1では暗号化機能は未実装
+    return true
+  })
+
+  /**
+   * すべての設定を削除
+   */
+  ipcMain.handle('settings:clearAll', async (): Promise<{ success: boolean }> => {
+    if (!databaseService.settings) {
+      throw new Error('Database not initialized')
+    }
+
+    databaseService.settings.clearAll()
+    return { success: true }
+  })
 }

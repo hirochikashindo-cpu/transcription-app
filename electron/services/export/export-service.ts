@@ -2,7 +2,6 @@ import { dialog } from 'electron'
 import fs from 'fs'
 import { promisify } from 'util'
 import { databaseService } from '../database/database-service'
-import type { ProjectRow, TranscriptionRow, SegmentRow } from '@shared/types/database'
 
 const writeFile = promisify(fs.writeFile)
 
@@ -10,6 +9,7 @@ const writeFile = promisify(fs.writeFile)
  * ExportService
  *
  * 文字起こし結果のエクスポート機能
+ * Repositoryパターンを使用
  * - JSON形式
  * - Markdown形式
  */
@@ -18,30 +18,26 @@ export class ExportService {
    * JSON形式でエクスポート
    */
   async exportToJson(projectId: string): Promise<void> {
-    const db = databaseService.getDatabase()
+    if (!databaseService.projects || !databaseService.transcriptions || !databaseService.segments) {
+      throw new Error('Database not initialized')
+    }
 
     // プロジェクト情報を取得
-    const project = db.prepare('SELECT * FROM projects WHERE id = ?').get(projectId) as
-      | ProjectRow
-      | undefined
+    const project = databaseService.projects.findById(projectId)
 
     if (!project) {
       throw new Error(`Project not found: ${projectId}`)
     }
 
     // 文字起こしデータを取得
-    const transcription = db
-      .prepare('SELECT * FROM transcriptions WHERE project_id = ? ORDER BY created_at DESC LIMIT 1')
-      .get(projectId) as TranscriptionRow | undefined
+    const transcription = databaseService.transcriptions.findByProjectId(projectId)
 
     if (!transcription) {
       throw new Error(`Transcription not found for project: ${projectId}`)
     }
 
     // セグメントデータを取得
-    const segments = db
-      .prepare('SELECT * FROM segments WHERE transcription_id = ? ORDER BY sequence_number ASC')
-      .all(transcription.id) as SegmentRow[]
+    const segments = databaseService.segments.findByTranscriptionId(transcription.id)
 
     // JSONデータを構築
     const exportData = {
@@ -89,30 +85,26 @@ export class ExportService {
    * Markdown形式でエクスポート
    */
   async exportToMarkdown(projectId: string): Promise<void> {
-    const db = databaseService.getDatabase()
+    if (!databaseService.projects || !databaseService.transcriptions || !databaseService.segments) {
+      throw new Error('Database not initialized')
+    }
 
     // プロジェクト情報を取得
-    const project = db.prepare('SELECT * FROM projects WHERE id = ?').get(projectId) as
-      | ProjectRow
-      | undefined
+    const project = databaseService.projects.findById(projectId)
 
     if (!project) {
       throw new Error(`Project not found: ${projectId}`)
     }
 
     // 文字起こしデータを取得
-    const transcription = db
-      .prepare('SELECT * FROM transcriptions WHERE project_id = ? ORDER BY created_at DESC LIMIT 1')
-      .get(projectId) as TranscriptionRow | undefined
+    const transcription = databaseService.transcriptions.findByProjectId(projectId)
 
     if (!transcription) {
       throw new Error(`Transcription not found for project: ${projectId}`)
     }
 
     // セグメントデータを取得
-    const segments = db
-      .prepare('SELECT * FROM segments WHERE transcription_id = ? ORDER BY sequence_number ASC')
-      .all(transcription.id) as SegmentRow[]
+    const segments = databaseService.segments.findByTranscriptionId(transcription.id)
 
     // Markdownを構築
     let markdown = `# ${project.title}\n\n`

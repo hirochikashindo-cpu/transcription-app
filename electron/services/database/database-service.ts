@@ -2,6 +2,10 @@ import Database from 'better-sqlite3'
 import path from 'path'
 import fs from 'fs'
 import { app } from 'electron'
+import { ProjectRepository } from './repositories/project-repository'
+import { TranscriptionRepository } from './repositories/transcription-repository'
+import { SegmentRepository } from './repositories/segment-repository'
+import { SettingsRepository } from './repositories/settings-repository'
 
 /**
  * DatabaseService
@@ -10,10 +14,17 @@ import { app } from 'electron'
  * - データベースの初期化
  * - マイグレーションの実行
  * - データベースインスタンスの提供
+ * - Repositoryインスタンスの管理
  */
 export class DatabaseService {
   private db: Database.Database | null = null
   private readonly dbPath: string
+
+  // Repository instances
+  public projects: ProjectRepository | null = null
+  public transcriptions: TranscriptionRepository | null = null
+  public segments: SegmentRepository | null = null
+  public settings: SettingsRepository | null = null
 
   constructor() {
     // ユーザーデータディレクトリにデータベースを配置
@@ -27,6 +38,7 @@ export class DatabaseService {
    * - データベースファイルを作成
    * - 外部キー制約を有効化
    * - マイグレーションを実行
+   * - Repositoryインスタンスを作成
    */
   initialize(): void {
     console.log('Initializing database...')
@@ -39,6 +51,12 @@ export class DatabaseService {
 
     // マイグレーションを実行
     this.runMigrations()
+
+    // Repositoryインスタンスを作成
+    this.projects = new ProjectRepository(this.db)
+    this.transcriptions = new TranscriptionRepository(this.db)
+    this.segments = new SegmentRepository(this.db)
+    this.settings = new SettingsRepository(this.db)
 
     console.log('Database initialized successfully')
   }
@@ -143,6 +161,13 @@ export class DatabaseService {
       console.log('Closing database...')
       this.db.close()
       this.db = null
+
+      // Repositoryインスタンスもクリア
+      this.projects = null
+      this.transcriptions = null
+      this.segments = null
+      this.settings = null
+
       console.log('Database closed')
     }
   }

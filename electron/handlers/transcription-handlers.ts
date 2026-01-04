@@ -1,12 +1,11 @@
 import { ipcMain, BrowserWindow } from 'electron'
-import { v4 as uuidv4 } from 'uuid'
-import { WhisperService } from '../services/whisper/whisper-service'
+import { whisperLocalService } from '../services/whisper/whisper-local-service'
 import { databaseService } from '../services/database/database-service'
 import type { Transcription, Segment, TranscriptionProgress } from '@shared/types/electron'
-import type { TranscriptionRow, SegmentRow } from '@shared/types/database'
 
 /**
  * 文字起こし処理のIPCハンドラー
+ * WhisperLocalService (whisper.cpp) を使用したローカル実行
  */
 export function registerTranscriptionHandlers(): void {
   /**
@@ -20,27 +19,16 @@ export function registerTranscriptionHandlers(): void {
         throw new Error('Window not found')
       }
 
+      if (!databaseService.projects || !databaseService.transcriptions || !databaseService.segments) {
+        throw new Error('Database not initialized')
+      }
+
       try {
         // プロジェクトのステータスを「処理中」に更新
-        const db = databaseService.getDatabase()
-        db.prepare(
-          'UPDATE projects SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
-        ).run('processing', projectId)
-
-        // 設定からAPI Keyを取得
-        const apiKeyRow = db
-          .prepare('SELECT value FROM settings WHERE key = ?')
-          .get('openai_api_key') as { value: string } | undefined
-
-        if (!apiKeyRow || !apiKeyRow.value) {
-          throw new Error('OpenAI API key not configured. Please set it in Settings.')
-        }
-
-        // WhisperServiceのインスタンスを作成
-        const whisperService = new WhisperService(apiKeyRow.value)
+        databaseService.projects.update(projectId, { status: 'processing' })
 
         // 進捗通知コールバック
-        const onProgress = (progress: number, _message?: string) => {
+        const onProgress = (progress: number, message?: string) => {
           const progressData: TranscriptionProgress = {
             projectId,
             status: 'processing',
@@ -48,39 +36,34 @@ export function registerTranscriptionHandlers(): void {
             error: undefined,
           }
           window.webContents.send('transcription:progress', progressData)
+          console.log(`Progress: ${progress.toFixed(1)}% - ${message}`)
         }
 
-        // 文字起こし実行
-        const result = await whisperService.transcribe(filePath, 'ja', onProgress)
+        // 文字起こし実行（ローカル）
+        const result = await whisperLocalService.transcribe(filePath, 'ja', onProgress)
 
         // 文字起こし結果をデータベースに保存
-        const transcriptionId = uuidv4()
+        const transcription = databaseService.transcriptions.create({
+          project_id: projectId,
+          content: result.text,
+          language: result.language,
+        })
 
-        // transcriptionsテーブルに保存
-        db.prepare(
-          `INSERT INTO transcriptions (id, project_id, content, language, created_at, updated_at)
-           VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`
-        ).run(transcriptionId, projectId, result.text, result.language)
+        // セグメントを一括保存
+        const segmentData = result.segments.map((seg) => ({
+          transcription_id: transcription.id,
+          start_time: seg.start_time,
+          end_time: seg.end_time,
+          text: seg.text,
+          confidence: seg.confidence,
+          sequence_number: seg.sequence_number,
+        }))
 
-        // segmentsテーブルに保存
-        const insertSegment = db.prepare(
-          `INSERT INTO segments (id, transcription_id, start_time, end_time, text, confidence, sequence_number)
-           VALUES (?, ?, ?, ?, ?, ?, ?)`
-        )
-
-        for (const segment of result.segments) {
-          insertSegment.run(
-            segment.id,
-            transcriptionId,
-            segment.start_time,
-            segment.end_time,
-            segment.text,
-            segment.confidence || null,
-            segment.sequence_number
-          )
-        }
+        databaseService.segments.createBatch(segmentData)
 
         // プロジェクトのステータスを「完了」に更新し、音声の長さを保存
+        // Note: UpdateProjectDataにaudio_durationがないため、直接SQLで更新
+        const db = databaseService.getDatabase()
         db.prepare(
           'UPDATE projects SET status = ?, audio_duration = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
         ).run('completed', result.duration, projectId)
@@ -97,10 +80,11 @@ export function registerTranscriptionHandlers(): void {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
 
         // プロジェクトのステータスを「失敗」に更新
-        const db = databaseService.getDatabase()
-        db.prepare(
-          'UPDATE projects SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
-        ).run('failed', projectId)
+        try {
+          databaseService.projects.update(projectId, { status: 'failed' })
+        } catch (updateError) {
+          console.error('Failed to update project status:', updateError)
+        }
 
         const errorProgress: TranscriptionProgress = {
           projectId,
@@ -121,46 +105,24 @@ export function registerTranscriptionHandlers(): void {
   ipcMain.handle(
     'transcription:getByProjectId',
     async (_event, projectId: string): Promise<Transcription> => {
-      const db = databaseService.getDatabase()
+      if (!databaseService.transcriptions || !databaseService.segments) {
+        throw new Error('Database not initialized')
+      }
 
       // 文字起こしデータを取得
-      const transcriptionRow = db
-        .prepare(
-          'SELECT * FROM transcriptions WHERE project_id = ? ORDER BY created_at DESC LIMIT 1'
-        )
-        .get(projectId) as TranscriptionRow | undefined
+      const transcription = databaseService.transcriptions.findByProjectId(projectId)
 
-      if (!transcriptionRow) {
+      if (!transcription) {
         throw new Error(`Transcription not found for project: ${projectId}`)
       }
 
       // セグメントデータを取得
-      const segmentRows = db
-        .prepare('SELECT * FROM segments WHERE transcription_id = ? ORDER BY sequence_number ASC')
-        .all(transcriptionRow.id) as SegmentRow[]
+      const segments = databaseService.segments.findByTranscriptionId(transcription.id)
 
-      const segments: Segment[] = segmentRows.map((row) => ({
-        id: row.id,
-        transcription_id: row.transcription_id,
-        start_time: row.start_time,
-        end_time: row.end_time,
-        text: row.text,
-        speaker_id: row.speaker_id,
-        confidence: row.confidence,
-        sequence_number: row.sequence_number,
-      }))
-
-      const transcription: Transcription = {
-        id: transcriptionRow.id,
-        project_id: transcriptionRow.project_id,
-        content: transcriptionRow.content,
-        language: transcriptionRow.language,
-        created_at: new Date(transcriptionRow.created_at),
-        updated_at: new Date(transcriptionRow.updated_at),
+      return {
+        ...transcription,
         segments,
       }
-
-      return transcription
     }
   )
 
@@ -170,43 +132,20 @@ export function registerTranscriptionHandlers(): void {
   ipcMain.handle(
     'transcription:updateSegment',
     async (_event, segmentId: string, text: string): Promise<Segment> => {
-      const db = databaseService.getDatabase()
+      if (!databaseService.segments || !databaseService.transcriptions) {
+        throw new Error('Database not initialized')
+      }
 
       // セグメントを更新
-      db.prepare('UPDATE segments SET text = ? WHERE id = ?').run(text, segmentId)
-
-      // 更新されたセグメントを取得
-      const segmentRow = db.prepare('SELECT * FROM segments WHERE id = ?').get(segmentId) as
-        | SegmentRow
-        | undefined
-
-      if (!segmentRow) {
-        throw new Error(`Segment not found: ${segmentId}`)
-      }
+      const segment = databaseService.segments.update(segmentId, { text })
 
       // 文字起こし全体のcontentも更新
-      const allSegments = db
-        .prepare(
-          'SELECT text FROM segments WHERE transcription_id = ? ORDER BY sequence_number ASC'
-        )
-        .all(segmentRow.transcription_id) as { text: string }[]
-
+      const allSegments = databaseService.segments.findByTranscriptionId(segment.transcription_id)
       const fullText = allSegments.map((s) => s.text).join(' ')
 
-      db.prepare(
-        'UPDATE transcriptions SET content = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
-      ).run(fullText, segmentRow.transcription_id)
-
-      const segment: Segment = {
-        id: segmentRow.id,
-        transcription_id: segmentRow.transcription_id,
-        start_time: segmentRow.start_time,
-        end_time: segmentRow.end_time,
-        text: segmentRow.text,
-        speaker_id: segmentRow.speaker_id,
-        confidence: segmentRow.confidence,
-        sequence_number: segmentRow.sequence_number,
-      }
+      databaseService.transcriptions.update(segment.transcription_id, {
+        content: fullText,
+      })
 
       return segment
     }

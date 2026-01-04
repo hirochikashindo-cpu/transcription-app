@@ -46,6 +46,21 @@ export interface Segment {
   sequence_number: number
 }
 
+export interface CreateSegmentData {
+  transcription_id: string
+  start_time: number
+  end_time: number
+  text: string
+  speaker_id?: string
+  confidence?: number
+  sequence_number: number
+}
+
+export interface UpdateSegmentData {
+  text?: string
+  speaker_id?: string
+}
+
 export interface Transcription {
   id: string
   project_id: string
@@ -54,6 +69,17 @@ export interface Transcription {
   created_at: Date
   updated_at: Date
   segments?: Segment[]
+}
+
+export interface CreateTranscriptionData {
+  project_id: string
+  content: string
+  language?: string
+}
+
+export interface UpdateTranscriptionData {
+  content?: string
+  language?: string
 }
 
 export interface TranscriptionProgress {
